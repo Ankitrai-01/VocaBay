@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoiceCart - E-Commerce with AI Voice Assistance</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo" id="nav-logo">
+      VoiceCart<span class="logo-dot"></span>
+    </div>
+    
+    <nav>
+      <a class="nav-link active" data-view="home">Home</a>
+      <a class="nav-link" data-view="shop">Shop</a>
+      <a class="nav-link" data-view="cart">Cart</a>
+      <a class="nav-link" data-view="tracking">Track Order</a>
+      <a class="nav-link" data-view="contact">Contact</a>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="cart-icon-container" id="nav-cart-btn" title="View Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="global-cart-badge">0</span>
+      </div>
+      
+      <!-- Account Status Header -->
+      <div id="header-auth-status">
+        <button class="btn btn-secondary btn-sm" id="nav-auth-btn" style="border-radius: 8px; padding: 0.5rem 1.25rem; font-size: 0.85rem;">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Router Container -->
+  <main>
+    
+    <!-- HOME VIEW -->
+    <section id="home-view" class="view-section active">
+      <div class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">Experience the<br><span class="gradient-text">Voice-Controlled</span><br>Shopping Era.</h1>
+          <p class="hero-subtitle">Navigate sections, search for items, select sizes, and complete purchases entirely hands-free using our advanced AI voice assistant.</p>
+          <div style="display: flex; gap: 1rem;">
+            <button class="btn btn-primary" id="hero-shop-btn">Explore Shop</button>
+            <button class="btn btn-secondary" id="hero-help-btn">Voice Commands</button>
+          </div>
+        </div>
+        <div class="hero-image-container">
+          <div class="hero-glow"></div>
+          <div class="hero-sphere">
+            <span class="hero-sphere-inner">VC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="categories-shelf">
+        <h3>Featured Categories</h3>
+        <div class="category-row">
+          <div class="category-chip" data-category="Electronics">Electronics</div>
+          <div class="category-chip" data-category="Apparel">Apparel</div>
+          <div class="category-chip" data-category="Footwear">Footwear</div>
+          <div class="category-chip" data-category="Accessories">Accessories</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOP / COLLECTIONS VIEW -->
+    <section id="shop-view" class="view-section">
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Explore Catalog</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Browse our premium items or tell the AI: <span style="font-family: monospace; color: var(--accent-cyan);">"search for jacket"</span></p>
+      
+      <div class="store-layout">
+        <!-- Sidebar filters -->
+        <aside class="filter-sidebar glass-panel">
+          <div class="filter-section">
+            <h4 class="filter-section-title">Categories</h4>
+            <div class="filter-option">
+              <input type="checkbox" id="cat-electronics" value="Electronics">
+              <label for="cat-electronics">Electronics</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="cat-apparel" value="Apparel">
+              <label for="cat-apparel">Apparel</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="cat-footwear" value="Footwear">
+              <label for="cat-footwear">Footwear</label>
+            </div>
+            <div class="filter-option">
+              <input type="checkbox" id="cat-accessories" value="Accessories">
+              <label for="cat-accessories">Accessories</label>
+            </div>
+          </div>
+          
+          <div class="filter-section">
+            <h4 class="filter-section-title">Price Range</h4>
+            <div class="filter-option">
+              <input type="radio" name="price-filter" id="price-all" value="all" checked>
+              <label for="price-all">All Prices</label>
+            </div>
+            <div class="filter-option">
+              <input type="radio" name="price-filter" id="price-low" value="0-50">
+              <label for="price-low">Under ₹5,000</label>
+            </div>
+            <div class="filter-option">
+              <input type="radio" name="price-filter" id="price-mid" value="50-150">
+              <label for="price-mid">₹5,000 - ₹15,000</label>
+            </div>
+            <div class="filter-option">
+              <input type="radio" name="price-filter" id="price-high" value="150-1000">
+              <label for="price-high">Over ₹15,000</label>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main product list -->
+        <div class="store-content">
+          <div class="store-content-header">
+            <div class="search-box-container">
+              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" class="form-control" id="product-search-input" placeholder="Search products...">
+            </div>
+            <div>
+              <select class="form-control" id="sort-select" style="width: auto;">
+                <option value="default">Sort by: Default</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="products-grid" id="products-grid-container">
+            <!-- Dynamic products populate here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT DETAIL VIEW -->
+    <section id="product-view" class="view-section">
+      <button class="btn btn-secondary" id="detail-back-btn" style="margin-bottom: 2rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Shop
+      </button>
+
+      <div class="product-detail-layout" id="product-detail-container">
+        <!-- Dynamic product details populate here -->
+      </div>
+    </section>
+
+    <!-- CART VIEW -->
+    <section id="cart-view" class="view-section">
+      <h2 style="font-size: 2.2rem; margin-bottom: 2rem;">Shopping Cart</h2>
+      
+      <div class="cart-layout">
+        <!-- Items column -->
+        <div class="cart-items-container" id="cart-items-list">
+          <!-- Dynamic cart items populate here -->
+        </div>
+
+        <!-- Summary column -->
+        <div class="cart-summary glass-panel">
+          <h3 class="summary-title">Order Summary</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="cart-subtotal">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span id="cart-shipping">₹0</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span id="cart-total">₹0</span>
+          </div>
+          <button class="btn btn-primary" id="checkout-proceed-btn" style="width: 100%; padding: 1rem;">Proceed to Checkout</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECKOUT VIEW -->
+    <section id="checkout-view" class="view-section">
+      <h2 style="font-size: 2.2rem; margin-bottom: 2rem;">Secure Checkout</h2>
+      
+      <div class="checkout-layout">
+        <div class="glass-panel">
+          <form id="checkout-shipping-form">
+            <h3 style="font-size: 1.3rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem;">Shipping Details</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label for="ship-firstname">First Name</label>
+                <input type="text" class="form-control" id="ship-firstname" required placeholder="John">
+              </div>
+              <div class="form-group">
+                <label for="ship-lastname">Last Name</label>
+                <input type="text" class="form-control" id="ship-lastname" required placeholder="Doe">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ship-email">Email Address</label>
+              <input type="email" class="form-control" id="ship-email" required placeholder="johndoe@example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="ship-address">Street Address</label>
+              <input type="text" class="form-control" id="ship-address" required placeholder="123 Main Street">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label for="ship-city">City</label>
+                <input type="text" class="form-control" id="ship-city" required placeholder="Mumbai">
+              </div>
+              <div class="form-group">
+                <label for="ship-pincode">Pincode</label>
+                <input type="text" class="form-control" id="ship-pincode" required placeholder="400001">
+              </div>
+            </div>
+
+            <h3 style="font-size: 1.3rem; margin-top: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem;">Payment Method</h3>
+            <div class="payment-methods-grid">
+              <div class="payment-method-card selected" data-payment="cod" id="payment-card-cod">
+                <span class="payment-method-title">Cash on Delivery</span>
+                <span class="payment-method-desc">Pay with cash when order arrives</span>
+              </div>
+              <div class="payment-method-card" data-payment="online" id="payment-card-online">
+                <span class="payment-method-title">Razorpay Secure</span>
+                <span class="payment-method-desc">Pay instantly using Cards/UPI/Netbanking</span>
+              </div>
+            </div>
+
+            <!-- Razorpay Config Panel -->
+            <div id="razorpay-key-container" style="display: none; margin-top: 1.5rem; animation: fadeIn 0.3s ease;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="razorpay-key-id">Razorpay Test Key ID (Optional)</label>
+                <input type="text" class="form-control" id="razorpay-key-id" placeholder="rzp_test_..." value="rzp_test_placeholderKey">
+                <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem; display: block;">Defaults to a mock demo key if left empty. Enter your own dashboard Test Key to run live sandbox cards/UPI.</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="checkout-submit-btn" style="width: 100%; margin-top: 2.5rem; padding: 1rem;">Place Order</button>
+          </form>
+        </div>
+
+        <!-- Sticky right summary in checkout -->
+        <div class="glass-panel" style="height: fit-content;">
+          <h3 class="summary-title" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.75rem;">Your Order</h3>
+          <div id="checkout-order-items" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 250px; overflow-y: auto; margin-bottom: 1.5rem;">
+            <!-- Order list pops here -->
+          </div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="checkout-subtotal">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span id="checkout-shipping">₹0</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span id="checkout-total">₹0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUCCESS VIEW -->
+    <section id="success-view" class="view-section">
+      <div class="glass-panel success-card">
+        <div class="success-icon-ring">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 style="font-size: 2.5rem; color: var(--accent-emerald);">Order Confirmed!</h2>
+        <p style="color: var(--text-secondary); max-width: 450px;">Thank you for shopping with VoiceCart. Your order has been placed successfully. Order ID: <span id="success-order-id" style="font-weight: 700; color: var(--text-primary);">#VC-82910</span></p>
+        <p id="success-payment-container" style="color: var(--text-secondary); max-width: 450px; margin-top: 0.5rem; display: none;">Razorpay Payment Reference: <span id="success-payment-id" style="font-weight: 700; color: var(--accent-cyan);">pay_xxxxxxxxx</span></p>
+        <div style="margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1.5rem; display: flex; gap: 1rem;">
+          <button class="btn btn-primary" id="success-home-btn">Go to Homepage</button>
+          <button class="btn btn-secondary" id="success-shop-btn">Continue Shopping</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTHENTICATION VIEW -->
+    <section id="auth-view" class="view-section">
+      <div class="glass-panel auth-container">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login-btn">Log In</button>
+          <button class="auth-tab" id="tab-signup-btn">Sign Up</button>
+        </div>
+
+        <!-- Login Form Card -->
+        <div class="auth-form-card active" id="auth-login-card">
+          <form id="auth-login-form">
+            <div class="form-group">
+              <label for="login-email">Email Address</label>
+              <input type="email" class="form-control" id="login-email" required placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input type="password" class="form-control" id="login-password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">Sign In Securely</button>
+          </form>
+        </div>
+
+        <!-- Signup Form Card -->
+        <div class="auth-form-card" id="auth-signup-card">
+          <form id="auth-signup-form">
+            <div class="form-group">
+              <label for="signup-name">Full Name</label>
+              <input type="text" class="form-control" id="signup-name" required placeholder="Aria Sharma">
+            </div>
+            <div class="form-group">
+              <label for="signup-email">Email Address</label>
+              <input type="email" class="form-control" id="signup-email" required placeholder="aria@example.com">
+            </div>
+            <div class="form-group">
+              <label for="signup-phone">Contact Number</label>
+              <input type="tel" class="form-control" id="signup-phone" required placeholder="9876543210">
+            </div>
+            <div class="form-group">
+              <label for="signup-password">Password</label>
+              <input type="password" class="form-control" id="signup-password" required placeholder="Create Secure Password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- USER PROFILE VIEW -->
+    <section id="profile-view" class="view-section">
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;" class="gradient-text">Customer Dashboard</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Manage your credentials and track your voice-controlled orders history.</p>
+
+      <div class="profile-layout">
+        <!-- Sidebar profile details -->
+        <aside class="glass-panel profile-sidebar-card">
+          <div class="profile-avatar-large" id="profile-large-avatar">A</div>
+          <h3 id="profile-user-name" style="font-size: 1.4rem;">Aria Sharma</h3>
+          <p id="profile-user-status" style="color: var(--accent-cyan); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Verified Buyer</p>
+
+          <div class="profile-field-group">
+            <span class="profile-field-label">Email Account</span>
+            <span class="profile-field-val" id="profile-user-email">aria@example.com</span>
+          </div>
+
+          <div class="profile-field-group">
+            <span class="profile-field-label">Contact Phone</span>
+            <span class="profile-field-val" id="profile-user-phone">9876543210</span>
+          </div>
+
+          <button class="btn btn-danger" id="profile-logout-btn" style="width: 100%; margin-top: 1.5rem; border-radius: 8px; padding: 0.75rem;">Log Out</button>
+        </aside>
+
+        <!-- Orders History -->
+        <div class="glass-panel" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <h3 style="font-size: 1.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.75rem;">Order History</h3>
+          <div class="orders-history-container" id="profile-orders-list">
+            <!-- Dynamic order history list -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDER TRACKING VIEW -->
+    <section id="tracking-view" class="view-section">
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;" class="gradient-text">Live Order Tracking</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Select an order from the list below or ask the assistant: <span style="font-family: monospace; color: var(--accent-cyan);">"track order VC-82910"</span></p>
+
+      <!-- Visual Orders Listing Panel -->
+      <div class="orders-list-panel" id="tracking-orders-list-panel">
+        <!-- Dynamic list of orders pops here -->
+      </div>
+
+      <!-- Real-time Stepper Dashboard (Initially Hidden) -->
+      <div class="glass-panel" id="tracking-stepper-panel" style="display: none; margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 1rem; margin-bottom: 2rem;">
+          <div>
+            <h3 style="font-size: 1.4rem;" id="tracking-order-title">Tracking #VC-12345</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="tracking-order-date">Placed on 26 May 2026</span>
+          </div>
+          <span style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; padding: 0.35rem 1rem; border-radius: 99px;" id="tracking-est-arrival">EST. ARRIVAL: TOMORROW</span>
+        </div>
+
+        <!-- Horizontal Progress Stepper -->
+        <div class="tracking-stepper-container">
+          <div class="stepper-bar-bg">
+            <div class="stepper-bar-fill" id="tracking-stepper-fill"></div>
+          </div>
+          <div class="step-nodes-row">
+            <div class="tracking-step" id="step-0">
+              <div class="step-circle">1</div>
+              <span class="step-title">Placed</span>
+            </div>
+            <div class="tracking-step" id="step-1">
+              <div class="step-circle">2</div>
+              <span class="step-title">Processing</span>
+            </div>
+            <div class="tracking-step" id="step-2">
+              <div class="step-circle">3</div>
+              <span class="step-title">Shipped</span>
+            </div>
+            <div class="tracking-step" id="step-3">
+              <div class="step-circle">4</div>
+              <span class="step-title">Dispatched</span>
+            </div>
+            <div class="tracking-step" id="step-4">
+              <div class="step-circle">5</div>
+              <span class="step-title">Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping, Items and Delivery Info Details -->
+        <div class="tracking-details-grid">
+          <!-- Ordered Items Block -->
+          <div class="info-block-card" style="grid-column: 1 / -1;" id="tracking-ordered-items-card">
+            <h4 class="info-block-title">Ordered Items</h4>
+            <div id="tracking-ordered-items-container" style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Dynamic items render here -->
+            </div>
+          </div>
+
+          <div class="info-block-card">
+            <h4 class="info-block-title">Shipping Address</h4>
+            <p id="tracking-ship-name" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">John Doe</p>
+            <p id="tracking-ship-address" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">123 Commuter Boulevard</p>
+          </div>
+
+          <div class="info-block-card">
+            <h4 class="info-block-title">Payment Info</h4>
+            <p id="tracking-pay-method" style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Cash on Delivery</p>
+            <p id="tracking-pay-receipt" style="font-size: 0.85rem; color: var(--text-muted); font-family: monospace;">Receipt: N/A</p>
+          </div>
+
+          <div class="info-block-card">
+            <h4 class="info-block-title">Delivery Courier</h4>
+            <p style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;" id="tracking-courier-name">VoiceCart Express Logistics</p>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);" id="tracking-courier-stage">Status: Shipped via Air Cargo</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT VIEW -->
+    <section id="contact-view" class="view-section">
+      <div class="glass-panel" style="max-width: 650px; margin: 2rem auto;">
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;" class="gradient-text">Contact Support</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Need assistance? Drop us a message, or simply ask the AI assistant: <span style="font-family: monospace; color: var(--accent-cyan);">"go to home"</span></p>
+        
+        <form id="contact-form" onsubmit="event.preventDefault(); alert('Message sent!');">
+          <div class="form-group">
+            <label for="contact-name">Full Name</label>
+            <input type="text" class="form-control" id="contact-name" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email Address</label>
+            <input type="email" class="form-control" id="contact-email" required placeholder="johndoe@example.com">
+          </div>
+          <div class="form-group">
+            <label for="contact-message">Your Message</label>
+            <textarea class="form-control" id="contact-message" rows="5" required placeholder="How can we help you?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Floating Help Drawer Toggle -->
+  <div class="help-drawer-toggle" id="help-drawer-toggle-btn" title="Voice Commands Guide">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </div>
+
+  <!-- Voice Commands Help Drawer -->
+  <div class="help-drawer" id="help-drawer-panel">
+    <div class="drawer-header">
+      <h3 style="font-size: 1.4rem;">Voice Guide</h3>
+      <button class="drawer-close" id="help-drawer-close-btn">&times;</button>
+    </div>
+    
+    <div class="command-group">
+      <div class="command-group-title">Navigation</div>
+      <div class="command-item">
+        <span class="command-phrase">"go to home" / "open home"</span>
+        <span>Redirection to home page</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"go to shop" / "open shop"</span>
+        <span>Browse product collections</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"go to cart" / "view cart"</span>
+        <span>Check your cart items</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"go to checkout"</span>
+        <span>Open secure checkout view</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"scroll down" / "scroll up"</span>
+        <span>Smoothly navigate long pages</span>
+      </div>
+    </div>
+
+    <div class="command-group">
+      <div class="command-group-title">Discovery</div>
+      <div class="command-item">
+        <span class="command-phrase">"search for [product]"</span>
+        <span>Search catalog by keyword</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"open product [name]"</span>
+        <span>Show detailed specifications</span>
+      </div>
+    </div>
+
+    <div class="command-group">
+      <div class="command-group-title">Cart & Purchase</div>
+      <div class="command-item">
+        <span class="command-phrase">"select size [small/medium/large]"</span>
+        <span>Choose product sizes (S, M, L, XL)</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"add to cart" / "add this"</span>
+        <span>Add item to shopping cart</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"select cash on delivery"</span>
+        <span>Set payment method to COD</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"select razorpay" / "card"</span>
+        <span>Set payment method to Razorpay</span>
+      </div>
+      <div class="command-item">
+        <span class="command-phrase">"place order" / "confirm order"</span>
+        <span>Submit details and complete purchase</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating AI Assistant Console -->
+  <div class="ai-assistant-widget" id="ai-widget-container">
+    
+    <!-- Speech Input Form Override -->
+    <form class="ai-bubble-form" id="ai-command-form" style="display: none;">
+      <input type="text" class="ai-bubble-input" id="ai-command-input" placeholder="Type command (e.g. 'go to shop')...">
+      <button type="submit" class="ai-bubble-btn">Run</button>
+    </form>
+
+    <div class="ai-trigger-container">
+      <!-- Glow Button Sphere -->
+      <div class="ai-sphere-button" id="ai-mic-btn" title="Click to talk / Enable Voice Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+      </div>
+
+      <!-- Live status tags -->
+      <div class="ai-status-indicator" id="ai-status-tag">
+        <span class="status-dot"></span>
+        <span class="status-text" id="ai-status-text">OFFLINE</span>
+      </div>
+
+      <!-- Hands-free Continuous Listening Mode -->
+      <button class="handsfree-toggle" id="ai-handsfree-btn" title="Continuous Listening Hands-Free Toggle">
+        Hands-Free: OFF
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Floating OTP Verification Modal Overlay -->
+  <div class="modal-overlay" id="otp-verification-modal">
+    <div class="otp-modal-content">
+      <h3 style="font-size: 1.6rem; margin-bottom: 0.5rem;" class="gradient-text">Verification Code</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;" id="otp-sent-message">We have sent a 6-digit verification code to your email.</p>
+      
+      <div class="otp-inputs-grid">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="0">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="1">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="2">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="3">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="4">
+        <input type="text" class="otp-digit-input" maxlength="1" data-index="5">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+        <button class="btn btn-primary" id="otp-submit-btn" style="width: 100%; padding: 0.75rem;">Verify & Register</button>
+        <button class="btn btn-secondary" id="otp-cancel-btn" style="width: 100%; padding: 0.75rem;">Cancel</button>
+      </div>
+
+      <span class="otp-timer-text" style="display:block; margin-top: 1.5rem;">
+        Resend code in <strong style="color:var(--text-primary);" id="otp-countdown-val">60</strong> seconds.
+        <a class="otp-resend-link disabled" id="otp-resend-btn" style="display:block; margin-top:0.5rem;">Resend Code</a>
+      </span>
+    </div>
+  </div>
+
+  <!-- Script logic -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
