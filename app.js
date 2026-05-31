@@ -86,6 +86,8 @@ async function loadProducts() {
   } catch (err) {
     console.error("API Catalog Error, falling back to static:", err);
     PRODUCTS = [...STATIC_PRODUCTS];
+  } finally {
+    renderProducts();
   }
 }
 
@@ -2294,6 +2296,20 @@ function initVendorListeners() {
 
 let recognition = null;
 let synth = window.speechSynthesis;
+let preferredVoice = null;
+
+function loadPreferredVoice() {
+  if (!synth) return;
+  const voices = synth.getVoices();
+  preferredVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Natural") || v.name.includes("Zira") || v.lang === "en-US");
+}
+
+if (synth) {
+  if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadPreferredVoice;
+  }
+  loadPreferredVoice();
+}
 
 function speak(message) {
   if (!synth) return;
@@ -2306,11 +2322,17 @@ function speak(message) {
   
   const utterance = new SpeechSynthesisUtterance(message);
   
-  // Premium synthetic voices selection if available
-  const voices = synth.getVoices();
-  const femaleVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Natural") || v.name.includes("Zira") || v.lang === "en-US");
-  if (femaleVoice) {
-    utterance.voice = femaleVoice;
+  // Use cached premium synthetic voice if available
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  } else {
+    // Fallback dynamic lookup
+    const voices = synth.getVoices();
+    const femaleVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Natural") || v.name.includes("Zira") || v.lang === "en-US");
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+      preferredVoice = femaleVoice; // Cache it
+    }
   }
   
   utterance.rate = 1.0;
@@ -2536,7 +2558,7 @@ async function processVoiceCommand(rawTranscript) {
   }
 
   // NAVIGATE ADMIN PANEL
-  if (query.match(/\b(go to|open|show|view)\b.*\b(admin|control room|admin panel)\b/) || query === "admin" || query === "admin panel" || query === "control room") {
+  if (query.match(/\b(go to|goto|go|open|show|view)\b.*\b(admin|control room|admin panel)\b/) || query === "admin" || query === "admin panel" || query === "control room") {
     if (!STATE.activeUser || STATE.activeUser.role !== "admin") {
       speak("You are not authorized to view the administrator panel.");
       showToast("Access Denied - Admins Only!", "error");
@@ -2548,7 +2570,7 @@ async function processVoiceCommand(rawTranscript) {
   }
   
   // NAVIGATE VENDOR PANEL
-  if (query.match(/\b(go to|open|show|view)\b.*\b(vendor|merchant|seller|command station)\b/) || query === "vendor" || query === "vendor panel" || query === "command station") {
+  if (query.match(/\b(go to|goto|go|open|show|view)\b.*\b(vendor|merchant|seller|command station)\b/) || query === "vendor" || query === "vendor panel" || query === "command station") {
     if (!STATE.activeUser || STATE.activeUser.role !== "vendor") {
       speak("You are not authorized to view the merchant dashboard.");
       showToast("Access Denied - Vendors Only!", "error");
@@ -2560,7 +2582,7 @@ async function processVoiceCommand(rawTranscript) {
   }
 
   // NAVIGATE PROFILE
-  if (query.match(/\b(go to|open|show|view)\b.*\b(profile|dashboard|account)\b/) || query === "profile" || query === "my account" || query === "dashboard") {
+  if (query.match(/\b(go to|goto|go|open|show|view)\b.*\b(profile|dashboard|account)\b/) || query === "profile" || query === "my account" || query === "dashboard") {
     if (!STATE.activeUser) {
       speak("You must log in to view your profile dashboard. Opening authentication page.");
       navigateTo("auth");
@@ -2572,7 +2594,7 @@ async function processVoiceCommand(rawTranscript) {
   }
 
   // NAVIGATE AUTH / LOGIN / SIGNUP
-  if (query.match(/\b(go to|open|show)\b.*\b(login|signin|sign in|auth)\b/) || query === "login" || query === "sign in") {
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\b(login|signin|sign in|auth)\b/) || query === "login" || query === "sign in" || query === "signin") {
     speak("Opening the login form.");
     navigateTo("auth");
     // Switch to login tab
@@ -2583,7 +2605,7 @@ async function processVoiceCommand(rawTranscript) {
     return;
   }
 
-  if (query.match(/\b(go to|open|show)\b.*\b(signup|register|join|sign up)\b/) || query === "signup" || query === "register") {
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\b(signup|register|join|sign up)\b/) || query === "signup" || query === "register" || query === "sign up") {
     speak("Opening registration form.");
     navigateTo("auth");
     // Switch to signup tab
@@ -2606,28 +2628,28 @@ async function processVoiceCommand(rawTranscript) {
   }
 
   // NAVIGATE HOME
-  if (query.match(/\b(go to|open|show)\b.*\bhome\b/) || query === "go home" || query === "homepage") {
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\bhome\b/) || query === "home" || query === "go home" || query === "homepage") {
     speak("Going to Home page");
     navigateTo("home");
     return;
   }
   
   // NAVIGATE SHOP / COLLECTION
-  if (query.match(/\b(go to|open|show|browse)\b.*\b(shop|collection|catalog|products|store)\b/) || query === "shop" || query === "store") {
-    speak("Opening the product catalog catalog");
+  if (query.match(/\b(go to|goto|go|open|show|browse)\b.*\b(shop|collection|catalog|products|store)\b/) || query === "shop" || query === "store" || query === "catalog" || query === "collection") {
+    speak("Opening the product catalog");
     navigateTo("shop");
     return;
   }
   
   // NAVIGATE CART
-  if (query.match(/\b(go to|open|show|view|check)\b.*\bcart\b/) || query === "view cart" || query === "show cart") {
+  if (query.match(/\b(go to|goto|go|open|show|view|check)\b.*\bcart\b/) || query === "cart" || query === "view cart" || query === "show cart") {
     speak("Opening your shopping cart");
     navigateTo("cart");
     return;
   }
   
   // NAVIGATE CHECKOUT
-  if (query.match(/\b(go to|open|show)\b.*\b(checkout|payment)\b/) || query === "checkout" || query === "proceed to checkout") {
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\b(checkout|payment)\b/) || query === "checkout" || query === "proceed to checkout") {
     if (STATE.cart.length === 0) {
       speak("Your cart is empty. Please add items before checking out.");
       showToast("Cart is empty!", "error");
@@ -2639,9 +2661,52 @@ async function processVoiceCommand(rawTranscript) {
   }
   
   // NAVIGATE CONTACT
-  if (query.match(/\b(go to|open|show)\b.*\b(contact|support)\b/) || query === "contact us" || query === "support") {
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\b(contact|support)\b/) || query === "contact" || query === "contact us" || query === "support") {
     speak("Opening support and contact page");
     navigateTo("contact");
+    return;
+  }
+
+  // NAVIGATE ABOUT
+  if (query.match(/\b(go to|goto|go|open|show)\b.*\babout\b/) || query === "about" || query === "about us") {
+    speak("Opening the about section");
+    navigateTo("about");
+    return;
+  }
+
+  // FAST DIRECT KEYWORD SHORTCUT FALLBACKS (For instant partial processing)
+  if (query === "home" || query === "main") {
+    speak("Going home");
+    navigateTo("home");
+    return;
+  }
+  if (query === "shop" || query === "store" || query === "catalog" || query === "items") {
+    speak("Opening shop");
+    navigateTo("shop");
+    return;
+  }
+  if (query === "cart" || query === "bag" || query === "basket") {
+    speak("Opening cart");
+    navigateTo("cart");
+    return;
+  }
+  if (query === "about" || query === "about us") {
+    speak("Opening about section");
+    navigateTo("about");
+    return;
+  }
+  if (query === "contact" || query === "support") {
+    speak("Opening contact");
+    navigateTo("contact");
+    return;
+  }
+  if (query === "checkout" || query === "pay") {
+    if (STATE.cart.length === 0) {
+      speak("Your cart is empty.");
+    } else {
+      speak("Opening checkout");
+      navigateTo("checkout");
+    }
     return;
   }
   
