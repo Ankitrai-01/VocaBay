@@ -76,7 +76,9 @@ const STATIC_PRODUCTS = [
   }
 ];
 let PRODUCTS = [];
-const API_URL = 'http://127.0.0.1:5000/api';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:5000/api'
+  : 'https://YOUR_PRODUCTION_BACKEND_URL_HERE.onrender.com/api'; // Replace with your production Render backend URL!
 
 async function loadProducts() {
   try {

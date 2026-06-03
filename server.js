@@ -10,7 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/vocabay')
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vocabay';
+mongoose.connect(mongoURI)
   .then(() => {
     console.log('Successfully connected to MongoDB.');
     prepopulateCatalog();
