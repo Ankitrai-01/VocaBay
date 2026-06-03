@@ -9,6 +9,16 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint for API status check
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'VocaBay API Server is running!',
+    timestamp: new Date()
+  });
+});
+
+
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vocabay';
 mongoose.connect(mongoURI)
